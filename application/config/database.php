@@ -48,7 +48,7 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['hostname'] = 'localhost';
+$db['default']['hostname'] = '69.64.69.79';
 $db['default']['username'] = 'admin_connect';
 $db['default']['password'] = 'd8^mKu89';
 $db['default']['database'] = 'ercas_connect_v1';
@@ -63,6 +63,23 @@ $db['default']['dbcollat'] = 'utf8_general_ci';
 $db['default']['swap_pre'] = '';
 $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
+
+
+$db['default2']['hostname'] = 'localhost';
+$db['default2']['username'] = 'root';
+$db['default2']['password'] = '';
+$db['default2']['database'] = 'vatex';
+$db['default2']['dbdriver'] = 'mysql';
+$db['default2']['dbprefix'] = '';
+$db['default2']['pconnect'] = false;
+$db['default2']['db_debug'] = TRUE;
+$db['default2']['cache_on'] = FALSE;
+$db['default2']['cachedir'] = '';
+$db['default2']['char_set'] = 'utf8';
+$db['default2']['dbcollat'] = 'utf8_general_ci';
+$db['default2']['swap_pre'] = '';
+$db['default2']['autoinit'] = TRUE;
+$db['default2']['stricton'] = FALSE;
 
 
 /* End of file database.php */
