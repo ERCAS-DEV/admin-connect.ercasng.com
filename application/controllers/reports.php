@@ -213,6 +213,7 @@ class Reports extends CI_Controller {
 		
 		exit;
 	}
+	
 
 	public function getbillertable(){
 		if($this->input->post('billerid')!=''){			

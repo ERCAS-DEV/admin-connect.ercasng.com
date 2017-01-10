@@ -5,164 +5,338 @@ class Reports_model extends CI_Model {
     {
         parent::__construct();
     }
+
+    public function table_name()
+    {
+    	$table = $this->db->list_tables();
+    	return $table;
+    }
 	
 	
 	function get_cd_list($tblname,$startdate,$enddate) {
-			$this->cds=$tblname;
-        /* Array of table columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-         */
 
-/*        $array_table = explode('_', $this->cds);
-        if(in_array("ecommerce", $array_table)){
-        	return 'yes';
-        }*/
-        
-        $aColumns = array(
-            'TransDate',
-			'CustomerID',
-			'CustomerName',
-			'PaidAmount',
-			'SourceBank'
-            );
+		//getting list of table name in db.
+		$table_list = $this->table_name();
+		if(in_array($tblname, $table_list)){
 
-        /* Indexed column (used for fast and accurate table cardinality) */
-        $sIndexColumn = "id";
+			//getting result from default database
+						$this->cds=$tblname;
+			        /* Array of table columns which should be read and sent back to DataTables. Use a space where
+			         * you want to insert a non-database field (for example a counter or static image)
+			         */
 
-        /* Total data set length */
-        $sQuery = "SELECT COUNT('" . $sIndexColumn . "') AS row_count
-            FROM $this->cds";
-        $rResultTotal = $this->db->query($sQuery);
-        $aResultTotal = $rResultTotal->row();
-        $iTotal = $aResultTotal->row_count;
+			/*        $array_table = explode('_', $this->cds);
+			        if(in_array("ecommerce", $array_table)){
+			        	return 'yes';
+			        }*/
+			        
+			        $aColumns = array(
+			            'TransDate',
+						'CustomerID',
+						'CustomerName',
+						'PaidAmount',
+						'SourceBank'
+			            );
 
-        /*
-         * Paging
-         */
-        $sLimit = "";
-        $iDisplayStart = $this->input->get_post('start', true);
-        $iDisplayLength = $this->input->get_post('length', true);
-        if (isset($iDisplayStart) && $iDisplayLength != '-1') {
-            $sLimit = "LIMIT " . intval($iDisplayStart) . ", " .
-                    intval($iDisplayLength);
-        }
+			        /* Indexed column (used for fast and accurate table cardinality) */
+			        $sIndexColumn = "id";
 
-        $uri_string = $_SERVER['QUERY_STRING'];
-        $uri_string = preg_replace("/\%5B/", '[', $uri_string);
-        $uri_string = preg_replace("/\%5D/", ']', $uri_string);
+			        /* Total data set length */
+			        $sQuery = "SELECT COUNT('" . $sIndexColumn . "') AS row_count
+			            FROM $this->cds";
+			        $rResultTotal = $this->db->query($sQuery);
+			        $aResultTotal = $rResultTotal->row();
+			        $iTotal = $aResultTotal->row_count;
 
-        $get_param_array = explode("&", $uri_string);
-        $arr = array();
-        foreach ($get_param_array as $value) {
-            $v = $value;
-            $explode = explode("=", $v);
-            $arr[$explode[0]] = $explode[1];
-        }
+			        /*
+			         * Paging
+			         */
+			        $sLimit = "";
+			        $iDisplayStart = $this->input->get_post('start', true);
+			        $iDisplayLength = $this->input->get_post('length', true);
+			        if (isset($iDisplayStart) && $iDisplayLength != '-1') {
+			            $sLimit = "LIMIT " . intval($iDisplayStart) . ", " .
+			                    intval($iDisplayLength);
+			        }
 
-        $index_of_columns = strpos($uri_string, "columns", 1);
-        $index_of_start = strpos($uri_string, "start");
-        $uri_columns = substr($uri_string, 7, ($index_of_start - $index_of_columns - 1));
-        $columns_array = explode("&", $uri_columns);
-        $arr_columns = array();
-        foreach ($columns_array as $value) {
-            $v = $value;
-            $explode = explode("=", $v);
-            if (count($explode) == 2) {
-                $arr_columns[$explode[0]] = $explode[1];
-            } else {
-                $arr_columns[$explode[0]] = '';
-            }
-        }
+			        $uri_string = $_SERVER['QUERY_STRING'];
+			        $uri_string = preg_replace("/\%5B/", '[', $uri_string);
+			        $uri_string = preg_replace("/\%5D/", ']', $uri_string);
 
-        /*
-         * Ordering
-         */
-        $sOrder = "ORDER BY ";
-        $sOrderIndex = $arr['order[0][column]'];
-        $sOrderDir = $arr['order[0][dir]'];
-        $bSortable_ = $arr_columns['columns[' . $sOrderIndex . '][orderable]'];
-        if ($bSortable_ == "true") {
-            $sOrder .= $aColumns[$sOrderIndex] .
-                    ($sOrderDir === 'asc' ? ' asc' : ' desc');
-        }
+			        $get_param_array = explode("&", $uri_string);
+			        $arr = array();
+			        foreach ($get_param_array as $value) {
+			            $v = $value;
+			            $explode = explode("=", $v);
+			            $arr[$explode[0]] = $explode[1];
+			        }
 
-        /*
-         * Filtering
-         */
-        $sWhere = "";
-		$sSearchVal = $arr['search[value]'];
-        if (isset($sSearchVal) && $sSearchVal != '') {
-			$sWhere = "WHERE (";
-        	
-            for ($i = 0; $i < count($aColumns); $i++) {
-                $sWhere .= $aColumns[$i] . " LIKE '%" . $this->db->escape_like_str($sSearchVal) . "%' OR ";
-            }
-            $sWhere = substr_replace($sWhere, "", -3);
-            $sWhere .= ')';
-        } 
+			        $index_of_columns = strpos($uri_string, "columns", 1);
+			        $index_of_start = strpos($uri_string, "start");
+			        $uri_columns = substr($uri_string, 7, ($index_of_start - $index_of_columns - 1));
+			        $columns_array = explode("&", $uri_columns);
+			        $arr_columns = array();
+			        foreach ($columns_array as $value) {
+			            $v = $value;
+			            $explode = explode("=", $v);
+			            if (count($explode) == 2) {
+			                $arr_columns[$explode[0]] = $explode[1];
+			            } else {
+			                $arr_columns[$explode[0]] = '';
+			            }
+			        }
+
+			        /*
+			         * Ordering
+			         */
+			        $sOrder = "ORDER BY ";
+			        $sOrderIndex = $arr['order[0][column]'];
+			        $sOrderDir = $arr['order[0][dir]'];
+			        $bSortable_ = $arr_columns['columns[' . $sOrderIndex . '][orderable]'];
+			        if ($bSortable_ == "true") {
+			            $sOrder .= $aColumns[$sOrderIndex] .
+			                    ($sOrderDir === 'asc' ? ' asc' : ' desc');
+			        }
+
+			        /*
+			         * Filtering
+			         */
+			        $sWhere = "";
+					$sSearchVal = $arr['search[value]'];
+			        if (isset($sSearchVal) && $sSearchVal != '') {
+						$sWhere = "WHERE (";
+			        	
+			            for ($i = 0; $i < count($aColumns); $i++) {
+			                $sWhere .= $aColumns[$i] . " LIKE '%" . $this->db->escape_like_str($sSearchVal) . "%' OR ";
+			            }
+			            $sWhere = substr_replace($sWhere, "", -3);
+			            $sWhere .= ')';
+			        } 
+					
+					if ($sWhere == "") {
+			                    $sWhere = "WHERE ";
+			                } else {
+			                    $sWhere .= " AND ";
+			                }
+					$sWhere .= " (str_to_date(TransDate,'%Y-%m-%d %H:%i')>='".$startdate."' and str_to_date(TransDate,'%Y-%m-%d %H:%i') <='".$enddate."')";
+					
+
+			        /* Individual column filtering */
+			        $sSearchReg = $arr['search[regex]'];
+			        for ($i = 0; $i < count($aColumns); $i++) {
+			            $bSearchable_ = $arr['columns[' . $i . '][searchable]'];
+			            if (isset($bSearchable_) && $bSearchable_ == "true" && $sSearchReg != 'false') {
+			                $search_val = $arr['columns[' . $i . '][search][value]'];
+			                if ($sWhere == "") {
+			                    $sWhere = "WHERE ";
+			                } else {
+			                    $sWhere .= " AND ";
+			                }
+			                $sWhere .= $aColumns[$i] . " LIKE '%" . $this->db->escape_like_str($search_val) . "%' ";
+			            }
+			        }
+
+
+			        /*
+			         * SQL queries
+			         * Get data to display
+			         */
+			         $sQuery = "SELECT SQL_CALC_FOUND_ROWS " . str_replace(" , ", " ", implode(", ", $aColumns)) . "
+			        FROM $this->cds
+			        $sWhere
+			        $sOrder
+			        $sLimit
+			        ";
+			        $rResult = $this->db->query($sQuery);
+
+			        /* Data set length after filtering */
+			        $sQuery = "SELECT FOUND_ROWS() AS length_count";
+			        $rResultFilterTotal = $this->db->query($sQuery);
+			        $aResultFilterTotal = $rResultFilterTotal->row();
+			        $iFilteredTotal = $aResultFilterTotal->length_count;
+
+			        /*
+			         * Output
+			         */
+			        $sEcho = $this->input->get_post('draw', true);
+			        $output = array(
+			            "draw" => intval($sEcho),
+			            "recordsTotal" => $iTotal,
+			            "recordsFiltered" => $iFilteredTotal,
+			            "data" => array()
+			        );
+
+			        foreach ($rResult->result_array() as $aRow) {
+			            $row = array();
+			            foreach ($aColumns as $col) {
+			                $row[] = $aRow[$col];
+			            }
+			            $output['data'][] = $row;
+			        }
+
+			        return $output;
+
+
+		}else{
+					$this->db2 = $this->load->database('default2', TRUE);
+						$this->cds=$tblname;
+			        /* Array of table columns which should be read and sent back to DataTables. Use a space where
+			         * you want to insert a non-database field (for example a counter or static image)
+			         */
+
+			/*        $array_table = explode('_', $this->cds);
+			        if(in_array("ecommerce", $array_table)){
+			        	return 'yes';
+			        }*/
+			        
+			        $aColumns = array(
+			            'TransDate',
+						'CustomerID',
+						'CustomerName',
+						'PaidAmount',
+						'SourceBank'
+			            );
+
+			        /* Indexed column (used for fast and accurate table cardinality) */
+			        $sIndexColumn = "id";
+
+			        /* Total data set length */
+			        $sQuery = "SELECT COUNT('" . $sIndexColumn . "') AS row_count
+			            FROM $this->cds";
+			        $rResultTotal = $this->db2->query($sQuery);
+			        $aResultTotal = $rResultTotal->row();
+			        $iTotal = $aResultTotal->row_count;
+
+			        /*
+			         * Paging
+			         */
+			        $sLimit = "";
+			        $iDisplayStart = $this->input->get_post('start', true);
+			        $iDisplayLength = $this->input->get_post('length', true);
+			        if (isset($iDisplayStart) && $iDisplayLength != '-1') {
+			            $sLimit = "LIMIT " . intval($iDisplayStart) . ", " .
+			                    intval($iDisplayLength);
+			        }
+
+			        $uri_string = $_SERVER['QUERY_STRING'];
+			        $uri_string = preg_replace("/\%5B/", '[', $uri_string);
+			        $uri_string = preg_replace("/\%5D/", ']', $uri_string);
+
+			        $get_param_array = explode("&", $uri_string);
+			        $arr = array();
+			        foreach ($get_param_array as $value) {
+			            $v = $value;
+			            $explode = explode("=", $v);
+			            $arr[$explode[0]] = $explode[1];
+			        }
+
+			        $index_of_columns = strpos($uri_string, "columns", 1);
+			        $index_of_start = strpos($uri_string, "start");
+			        $uri_columns = substr($uri_string, 7, ($index_of_start - $index_of_columns - 1));
+			        $columns_array = explode("&", $uri_columns);
+			        $arr_columns = array();
+			        foreach ($columns_array as $value) {
+			            $v = $value;
+			            $explode = explode("=", $v);
+			            if (count($explode) == 2) {
+			                $arr_columns[$explode[0]] = $explode[1];
+			            } else {
+			                $arr_columns[$explode[0]] = '';
+			            }
+			        }
+
+			        /*
+			         * Ordering
+			         */
+			        $sOrder = "ORDER BY ";
+			        $sOrderIndex = $arr['order[0][column]'];
+			        $sOrderDir = $arr['order[0][dir]'];
+			        $bSortable_ = $arr_columns['columns[' . $sOrderIndex . '][orderable]'];
+			        if ($bSortable_ == "true") {
+			            $sOrder .= $aColumns[$sOrderIndex] .
+			                    ($sOrderDir === 'asc' ? ' asc' : ' desc');
+			        }
+
+			        /*
+			         * Filtering
+			         */
+			        $sWhere = "";
+					$sSearchVal = $arr['search[value]'];
+			        if (isset($sSearchVal) && $sSearchVal != '') {
+						$sWhere = "WHERE (";
+			        	
+			            for ($i = 0; $i < count($aColumns); $i++) {
+			                $sWhere .= $aColumns[$i] . " LIKE '%" . $this->db2->escape_like_str($sSearchVal) . "%' OR ";
+			            }
+			            $sWhere = substr_replace($sWhere, "", -3);
+			            $sWhere .= ')';
+			        } 
+					
+					if ($sWhere == "") {
+			                    $sWhere = "WHERE ";
+			                } else {
+			                    $sWhere .= " AND ";
+			                }
+					$sWhere .= " (str_to_date(TransDate,'%Y-%m-%d %H:%i')>='".$startdate."' and str_to_date(TransDate,'%Y-%m-%d %H:%i') <='".$enddate."')";
+					
+
+			        /* Individual column filtering */
+			        $sSearchReg = $arr['search[regex]'];
+			        for ($i = 0; $i < count($aColumns); $i++) {
+			            $bSearchable_ = $arr['columns[' . $i . '][searchable]'];
+			            if (isset($bSearchable_) && $bSearchable_ == "true" && $sSearchReg != 'false') {
+			                $search_val = $arr['columns[' . $i . '][search][value]'];
+			                if ($sWhere == "") {
+			                    $sWhere = "WHERE ";
+			                } else {
+			                    $sWhere .= " AND ";
+			                }
+			                $sWhere .= $aColumns[$i] . " LIKE '%" . $this->db2->escape_like_str($search_val) . "%' ";
+			            }
+			        }
+
+
+			        /*
+			         * SQL queries
+			         * Get data to display
+			         */
+			         $sQuery = "SELECT SQL_CALC_FOUND_ROWS " . str_replace(" , ", " ", implode(", ", $aColumns)) . "
+			        FROM $this->cds
+			        $sWhere
+			        $sOrder
+			        $sLimit
+			        ";
+			        $rResult = $this->db2->query($sQuery);
+
+			        /* Data set length after filtering */
+			        $sQuery = "SELECT FOUND_ROWS() AS length_count";
+			        $rResultFilterTotal = $this->db2->query($sQuery);
+			        $aResultFilterTotal = $rResultFilterTotal->row();
+			        $iFilteredTotal = $aResultFilterTotal->length_count;
+
+			        /*
+			         * Output
+			         */
+			        $sEcho = $this->input->get_post('draw', true);
+			        $output = array(
+			            "draw" => intval($sEcho),
+			            "recordsTotal" => $iTotal,
+			            "recordsFiltered" => $iFilteredTotal,
+			            "data" => array()
+			        );
+
+			        foreach ($rResult->result_array() as $aRow) {
+			            $row = array();
+			            foreach ($aColumns as $col) {
+			                $row[] = $aRow[$col];
+			            }
+			            $output['data'][] = $row;
+			        }
+
+			        return $output;
+
+		}
 		
-		if ($sWhere == "") {
-                    $sWhere = "WHERE ";
-                } else {
-                    $sWhere .= " AND ";
-                }
-		$sWhere .= " (str_to_date(TransDate,'%Y-%m-%d %H:%i')>='".$startdate."' and str_to_date(TransDate,'%Y-%m-%d %H:%i') <='".$enddate."')";
-		
-
-        /* Individual column filtering */
-        $sSearchReg = $arr['search[regex]'];
-        for ($i = 0; $i < count($aColumns); $i++) {
-            $bSearchable_ = $arr['columns[' . $i . '][searchable]'];
-            if (isset($bSearchable_) && $bSearchable_ == "true" && $sSearchReg != 'false') {
-                $search_val = $arr['columns[' . $i . '][search][value]'];
-                if ($sWhere == "") {
-                    $sWhere = "WHERE ";
-                } else {
-                    $sWhere .= " AND ";
-                }
-                $sWhere .= $aColumns[$i] . " LIKE '%" . $this->db->escape_like_str($search_val) . "%' ";
-            }
-        }
-
-
-        /*
-         * SQL queries
-         * Get data to display
-         */
-         $sQuery = "SELECT SQL_CALC_FOUND_ROWS " . str_replace(" , ", " ", implode(", ", $aColumns)) . "
-        FROM $this->cds
-        $sWhere
-        $sOrder
-        $sLimit
-        ";
-        $rResult = $this->db->query($sQuery);
-
-        /* Data set length after filtering */
-        $sQuery = "SELECT FOUND_ROWS() AS length_count";
-        $rResultFilterTotal = $this->db->query($sQuery);
-        $aResultFilterTotal = $rResultFilterTotal->row();
-        $iFilteredTotal = $aResultFilterTotal->length_count;
-
-        /*
-         * Output
-         */
-        $sEcho = $this->input->get_post('draw', true);
-        $output = array(
-            "draw" => intval($sEcho),
-            "recordsTotal" => $iTotal,
-            "recordsFiltered" => $iFilteredTotal,
-            "data" => array()
-        );
-
-        foreach ($rResult->result_array() as $aRow) {
-            $row = array();
-            foreach ($aColumns as $col) {
-                $row[] = $aRow[$col];
-            }
-            $output['data'][] = $row;
-        }
-
-        return $output;
     }
 	
 	

@@ -65,10 +65,10 @@ $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
 
 
-$db['default2']['hostname'] = 'localhost';
-$db['default2']['username'] = 'root';
-$db['default2']['password'] = '';
-$db['default2']['database'] = 'vatex';
+$db['default2']['hostname'] = '69.64.69.79';
+$db['default2']['username'] = 'admin_ercas_fela';
+$db['default2']['password'] = '1204RUSHinka#';
+$db['default2']['database'] = 'ercasdb_test';
 $db['default2']['dbdriver'] = 'mysql';
 $db['default2']['dbprefix'] = '';
 $db['default2']['pconnect'] = false;
