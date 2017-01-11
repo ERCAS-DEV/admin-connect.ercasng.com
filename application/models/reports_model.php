@@ -341,68 +341,138 @@ class Reports_model extends CI_Model {
 	
 	
 	public function generate_analysis_data($tblnm,$startdate,$enddate){
-		
-				$date1 = new DateTime($startdate);
-				$date2 = new DateTime($enddate);
-				$diff = $date2->diff($date1)->format("%a");
-				//echo "<pre>";
-				$x=0;
-				$resultarr = array();
-				if($diff<=30){
-					while($x <= $diff){
-					$y = $x+1;
-					$stdate = date('Y-m-d', strtotime($startdate .' +'.$x.' day')); 
-					$endate = date('Y-m-d', strtotime($startdate .' +'.$y.' day'));
-						$data = $this->db->query("select PaidAmount, UNIX_TIMESTAMP( STR_TO_DATE( TransDate,  '%Y-%m-%d %H:%i' ) ) as timestampdate, str_to_date(TransDate,'%Y-%m-%d %H:%i') as datetimestamp FROM $tblnm where str_to_date(TransDate,'%Y-%m-%d %H:%i')>='".$stdate."' and str_to_date(TransDate,'%Y-%m-%d %H:%i') <='".$endate."'")->result();
-						
-						$amount=0;
-						if(sizeof($data)>0){
-							foreach($data as $curdata){
-								$PaidAmount = str_replace(",",'',$curdata->PaidAmount);
-								$amount += $PaidAmount;
-							}
-						}
-						$stdate = date('M-d', strtotime($stdate));
-						$resultarr[$x] = array($stdate,$amount);	
-						$x++;
-					}
-				}elseif($diff>30){
-				//	echo "sdf";
-				//&& $diff<=34
-					$x=0;
+		//getting list of table name in db.
+		$table_list = $this->table_name();
+		if(in_array($tblname, $table_list)){
+					$date1 = new DateTime($startdate);
+					$date2 = new DateTime($enddate);
+					$diff = $date2->diff($date1)->format("%a");
 					//echo "<pre>";
-					//$diff = ceil($diff/7);
-					while($x <= $diff){
-					$y = $x+30;
-					$stdate = date('Y-m-d', strtotime($startdate .' +'.$x.' day')); 
-					//echo $x;
-					//echo "<br>";
-					if(($x+30)>=	 $diff){
-						$endate = $enddate;
-					} else {
+					$x=0;
+					$resultarr = array();
+					if($diff<=30){
+						while($x <= $diff){
+						$y = $x+1;
+						$stdate = date('Y-m-d', strtotime($startdate .' +'.$x.' day')); 
 						$endate = date('Y-m-d', strtotime($startdate .' +'.$y.' day'));
-					}
-						$data = $this->db->query("select PaidAmount, UNIX_TIMESTAMP( STR_TO_DATE( TransDate,  '%d-%m-%Y %H:%i' ) ) as timestampdate, str_to_date(TransDate,'%d-%m-%Y %H:%i') as datetimestamp FROM $tblnm where str_to_date(TransDate,'%d-%m-%Y %H:%i')>='".$stdate."' and str_to_date(TransDate,'%d-%m-%Y %H:%i') <='".$endate."'")->result();
-						
-						$amount=0;
-						if(sizeof($data)>0){
-							foreach($data as $curdata){
-								$PaidAmount = str_replace(",",'',$curdata->PaidAmount);
-								$amount += $PaidAmount;
+							$data = $this->db->query("select PaidAmount, UNIX_TIMESTAMP( STR_TO_DATE( TransDate,  '%Y-%m-%d %H:%i' ) ) as timestampdate, str_to_date(TransDate,'%Y-%m-%d %H:%i') as datetimestamp FROM $tblnm where str_to_date(TransDate,'%Y-%m-%d %H:%i')>='".$stdate."' and str_to_date(TransDate,'%Y-%m-%d %H:%i') <='".$endate."'")->result();
+							
+							$amount=0;
+							if(sizeof($data)>0){
+								foreach($data as $curdata){
+									$PaidAmount = str_replace(",",'',$curdata->PaidAmount);
+									$amount += $PaidAmount;
+								}
 							}
+							$stdate = date('M-d', strtotime($stdate));
+							$resultarr[$x] = array($stdate,$amount);	
+							$x++;
 						}
-						$resultarr[$x] = array($stdate,$amount);	
-						//echo $this->db->last_query();
-						//print_r($data);
-						$x = $x+30;
+					}elseif($diff>30){
+					//	echo "sdf";
+					//&& $diff<=34
+						$x=0;
+						//echo "<pre>";
+						//$diff = ceil($diff/7);
+						while($x <= $diff){
+						$y = $x+30;
+						$stdate = date('Y-m-d', strtotime($startdate .' +'.$x.' day')); 
+						//echo $x;
+						//echo "<br>";
+						if(($x+30)>=	 $diff){
+							$endate = $enddate;
+						} else {
+							$endate = date('Y-m-d', strtotime($startdate .' +'.$y.' day'));
+						}
+							$data = $this->db->query("select PaidAmount, UNIX_TIMESTAMP( STR_TO_DATE( TransDate,  '%d-%m-%Y %H:%i' ) ) as timestampdate, str_to_date(TransDate,'%d-%m-%Y %H:%i') as datetimestamp FROM $tblnm where str_to_date(TransDate,'%d-%m-%Y %H:%i')>='".$stdate."' and str_to_date(TransDate,'%d-%m-%Y %H:%i') <='".$endate."'")->result();
+							
+							$amount=0;
+							if(sizeof($data)>0){
+								foreach($data as $curdata){
+									$PaidAmount = str_replace(",",'',$curdata->PaidAmount);
+									$amount += $PaidAmount;
+								}
+							}
+							$resultarr[$x] = array($stdate,$amount);	
+							//echo $this->db->last_query();
+							//print_r($data);
+							$x = $x+30;
+						}
 					}
-				}
-				//print_r($resultarr);
-				return $resultarr;
+					//print_r($resultarr);
+					return $resultarr;
+			
+			//$data = $this->db->query("select *, UNIX_TIMESTAMP( STR_TO_DATE( TransDate,  '%d-%m-%Y %H:%i' ) ) as timestampdate, str_to_date(TransDate,'%d-%m-%Y %H:%i') as datetimestamp FROM $tblnm where str_to_date(TransDate,'%d-%m-%Y %H:%i')>='".$startdate."' and str_to_date(TransDate,'%d-%m-%Y %H:%i') <='".$enddate."'")->result();
+			//echo $this->db->last_query(); 	
+			//return $data;
+		}else{
+			$this->db2 = $this->load->database('default2', TRUE);
+
+					$date1 = new DateTime($startdate);
+					$date2 = new DateTime($enddate);
+					$diff = $date2->diff($date1)->format("%a");
+					//echo "<pre>";
+					$x=0;
+					$resultarr = array();
+					if($diff<=30){
+						while($x <= $diff){
+						$y = $x+1;
+						$stdate = date('Y-m-d', strtotime($startdate .' +'.$x.' day')); 
+						$endate = date('Y-m-d', strtotime($startdate .' +'.$y.' day'));
+							$data = $this->db2->query("select PaidAmount, UNIX_TIMESTAMP( STR_TO_DATE( TransDate,  '%Y-%m-%d %H:%i' ) ) as timestampdate, str_to_date(TransDate,'%Y-%m-%d %H:%i') as datetimestamp FROM $tblnm where str_to_date(TransDate,'%Y-%m-%d %H:%i')>='".$stdate."' and str_to_date(TransDate,'%Y-%m-%d %H:%i') <='".$endate."'")->result();
+							
+							$amount=0;
+							if(sizeof($data)>0){
+								foreach($data as $curdata){
+									$PaidAmount = str_replace(",",'',$curdata->PaidAmount);
+									$amount += $PaidAmount;
+								}
+							}
+							$stdate = date('M-d', strtotime($stdate));
+							$resultarr[$x] = array($stdate,$amount);	
+							$x++;
+						}
+					}elseif($diff>30){
+					//	echo "sdf";
+					//&& $diff<=34
+						$x=0;
+						//echo "<pre>";
+						//$diff = ceil($diff/7);
+						while($x <= $diff){
+						$y = $x+30;
+						$stdate = date('Y-m-d', strtotime($startdate .' +'.$x.' day')); 
+						//echo $x;
+						//echo "<br>";
+						if(($x+30)>=	 $diff){
+							$endate = $enddate;
+						} else {
+							$endate = date('Y-m-d', strtotime($startdate .' +'.$y.' day'));
+						}
+							$data = $this->db2->query("select PaidAmount, UNIX_TIMESTAMP( STR_TO_DATE( TransDate,  '%d-%m-%Y %H:%i' ) ) as timestampdate, str_to_date(TransDate,'%d-%m-%Y %H:%i') as datetimestamp FROM $tblnm where str_to_date(TransDate,'%d-%m-%Y %H:%i')>='".$stdate."' and str_to_date(TransDate,'%d-%m-%Y %H:%i') <='".$endate."'")->result();
+							
+							$amount=0;
+							if(sizeof($data)>0){
+								foreach($data as $curdata){
+									$PaidAmount = str_replace(",",'',$curdata->PaidAmount);
+									$amount += $PaidAmount;
+								}
+							}
+							$resultarr[$x] = array($stdate,$amount);	
+							//echo $this->db->last_query();
+							//print_r($data);
+							$x = $x+30;
+						}
+					}
+					//print_r($resultarr);
+					return $resultarr;
+			
+			//$data = $this->db->query("select *, UNIX_TIMESTAMP( STR_TO_DATE( TransDate,  '%d-%m-%Y %H:%i' ) ) as timestampdate, str_to_date(TransDate,'%d-%m-%Y %H:%i') as datetimestamp FROM $tblnm where str_to_date(TransDate,'%d-%m-%Y %H:%i')>='".$startdate."' and str_to_date(TransDate,'%d-%m-%Y %H:%i') <='".$enddate."'")->result();
+			//echo $this->db->last_query(); 	
+			//return $data;
+
+		}
 		
-		//$data = $this->db->query("select *, UNIX_TIMESTAMP( STR_TO_DATE( TransDate,  '%d-%m-%Y %H:%i' ) ) as timestampdate, str_to_date(TransDate,'%d-%m-%Y %H:%i') as datetimestamp FROM $tblnm where str_to_date(TransDate,'%d-%m-%Y %H:%i')>='".$startdate."' and str_to_date(TransDate,'%d-%m-%Y %H:%i') <='".$enddate."'")->result();
-		//echo $this->db->last_query(); 	
-		//return $data;
+
 	}
 	
 	public function report(){
